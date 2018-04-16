@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace EmployeePortalApplication.Controllers
+namespace LGSS.DevMentoring.EmployeePortal.Controllers
 {
     public class HomeController : Controller
     {
