@@ -42,15 +42,15 @@
             @Html.DisplayFor(model => model.EmployeeNumber)
         </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Photo)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Photo)
-        </dd>
-
     </dl>
+
+    <div>
+        @{
+        var imgSrc = String.Format("data:image/gif;base64,{0}", Model.Photo);
+        }
+
+        <img src="@imgSrc" />
+    </div>
 </div>
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |

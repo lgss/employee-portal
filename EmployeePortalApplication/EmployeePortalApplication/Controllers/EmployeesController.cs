@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -47,10 +48,21 @@ namespace LGSS.Mentoring.EmployeePortal.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Forename,Surname,JobTitle,EmployeeNumber,Photo")] Employee employee)
+        public ActionResult Create([Bind(Include = "ID,Forename,Surname,JobTitle,EmployeeNumber,File")] Employee employee, HttpPostedFileBase file)
         {
             if (ModelState.IsValid)
             {
+                if (file != null)
+                {
+                    byte[] thePictureAsBytes = new byte[file.ContentLength];
+                    using (BinaryReader theReader = new BinaryReader(file.InputStream))
+                    {
+                        thePictureAsBytes = theReader.ReadBytes(file.ContentLength);
+                    }
+
+                    employee.Photo = Convert.ToBase64String(thePictureAsBytes);
+                }
+
                 db.Employees.Add(employee);
                 db.SaveChanges();
                 return RedirectToAction("Index");
