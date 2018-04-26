@@ -8,6 +8,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using LGSS.Mentoring.EmployeePortal;
+using LGSS.Mentoring.EmployeePortal.Helper;
 using LGSS.Mentoring.EmployeePortal.Models;
 
 namespace LGSS.Mentoring.EmployeePortal.Controllers
@@ -60,8 +61,23 @@ namespace LGSS.Mentoring.EmployeePortal.Controllers
                         thePictureAsBytes = theReader.ReadBytes(file.ContentLength);
                     }
 
-                    employee.Photo = Convert.ToBase64String(thePictureAsBytes);
+
+                    // Convert photo to base64
+                    string tempPhoto = Convert.ToBase64String(thePictureAsBytes);
+
+                    // Send thePictureAsBytes to Google Vision API
+                    bool imageValidated = ImageValidationHelper.ValidateImage(tempPhoto);
+
+                    // Check if photo meets standard
+                    if (imageValidated)
+                    {
+                        // add photo to employee
+                        employee.Photo = tempPhoto;
+                    }
+                    
+
                 }
+
 
                 db.Employees.Add(employee);
                 db.SaveChanges();
