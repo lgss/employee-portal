@@ -16,6 +16,8 @@ namespace GoogleVisionAPI
         public Safesearchannotation safeSearchAnnotation { get; set; }
         public Webdetection webDetection { get; set; }
         public Labelannotation labelAnnotation { get; set; }
+        public Faceannotation[] faceAnnotations { get; set; }
+
     }
 
     public class Safesearchannotation
@@ -53,5 +55,21 @@ namespace GoogleVisionAPI
         public float score { get; set; }
     }
 
-}
+    public class Faceannotation
+    {
+        public Boundingpoly boundingPoly { get; set; }
+        public string blurredLikelihood { get; set; }
+        public string headwearLikelihood { get; set; }
+    }
 
+    public class Boundingpoly
+    {
+        public Vertex[] vertices { get; set; }
+    }
+
+    public class Vertex
+    {
+        public int x { get; set; }
+        public int y { get; set; }
+    }
+}

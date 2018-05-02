@@ -15,19 +15,37 @@ namespace LGSS.Mentoring.EmployeePortal.Helper
     {
         public static bool ValidateImage(string base64)
         {
-            string url = String.Format("https://vision.googleapis.com/v1/images:annotate?fields=responses(error%2CsafeSearchAnnotation%2CwebDetection)&key=AIzaSyDXDoLooB6HezLF8dV3kD9kg5xUTJLiaAM");
-            string response = CallVisionAPI(url,base64);
+            string url = String.Format("https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDXDoLooB6HezLF8dV3kD9kg5xUTJLiaAM");
+            string response = CallVisionAPI(url, base64);
             VisionAPIResponse apiResponse = DeserializeResponse(response);
 
+            // Check if a response exists
+            Response responseCheck = apiResponse.responses.SingleOrDefault();
 
-            // Get a list of entities
-            List<Webentity> entities = apiResponse.responses.Single().webDetection.webEntities.Where(i => i.description != null && i.description.ToLower().Contains("passport") && i.score > 0.5).ToList();
+            if (responseCheck == null)
+            {
+                return false;
+            }
 
-            // TODO: Catch error if list is returned null
+            // Check if there are any faces or more than one
+            Faceannotation[] responseFaces = responseCheck.faceAnnotations;
 
-            // Check if the list is greater than 0
+            if (responseFaces.Count() > 1 || responseFaces.Count() == 0)
+            {
+                return false;
+            }
+
+            // Check if description, passport and score
+            List<Webentity> entities = responseCheck.webDetection.webEntities
+                .Where(i => i.description != null
+                && i.description.ToLower().Contains("passport")
+                && i.score > 0.5)
+                .ToList();
+
+            //TODO: Blend checking logic with new logic
+            // Check if the entities list is greater than 0
             return entities.Count > 0 ? true : false;
-            
+
 
         }
 
@@ -55,11 +73,12 @@ namespace LGSS.Mentoring.EmployeePortal.Helper
             Feature webDetect = new Feature { type = "WEB_DETECTION" };
             Feature safeDetect = new Feature { type = "SAFE_SEARCH_DETECTION" };
             Feature labelDetect = new Feature { type = "LABEL_DETECTION" };
+            Feature faceDetect = new Feature { type = "FACE_DETECTION" };
             Image image = new Image { content = base64 };
 
             Request request = new Request
             {
-                features = new Feature[] { webDetect, safeDetect, labelDetect },
+                features = new Feature[] { webDetect, safeDetect, labelDetect, faceDetect },
                 image = image
             };
 
